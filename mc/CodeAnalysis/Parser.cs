@@ -1,6 +1,6 @@
 namespace Minsk.CodeAnalysis;
 
-class Parser
+internal sealed class Parser
 {
     private readonly SyntaxToken[] _tokens;
     private int _position;
@@ -14,7 +14,7 @@ class Parser
         SyntaxToken token;
         do
         {
-            token = lexer.NextToken();
+            token = lexer.Lex();
 
             if (token.Kind != SyntaxKind.WhitespaceToken &&
                 token.Kind != SyntaxKind.BadToken)
@@ -49,7 +49,7 @@ class Parser
         return current;
     }
 
-    private SyntaxToken Match(SyntaxKind kind)
+    private SyntaxToken MatchToken(SyntaxKind kind)
     {
         if (Current.Kind == kind)
         {
@@ -60,16 +60,16 @@ class Parser
         return new SyntaxToken(kind, Current.Position, null, null);
     }
 
+    public SyntaxTree Parse()
+    {
+        var expression = ParseExpression();
+        var endOfFileToken = MatchToken(SyntaxKind.EndOfFileToken);
+        return new SyntaxTree(_diagnostics, expression, endOfFileToken);
+    }
+
     private ExpressionSyntax ParseExpression()
     {
         return ParseTerm();
-    }
-
-    public SyntaxTree Parse()
-    {
-        var expression = ParseTerm();
-        var endOfFileToken = Match(SyntaxKind.EndOfFileToken);
-        return new SyntaxTree(_diagnostics, expression, endOfFileToken);
     }
 
     private ExpressionSyntax ParseTerm()
@@ -108,12 +108,12 @@ class Parser
         {
             var left= NextToken();
             var expression = ParseExpression();
-            var rigth = Match(SyntaxKind.CloseParenthesisToken);
+            var rigth = MatchToken(SyntaxKind.CloseParenthesisToken);
             return new ParenthesizedExpressionSyntax(left, expression, rigth);
         }
 
-        var numberToken = Match(SyntaxKind.NumberToken);
-        return new NumberExpressionSyntax(numberToken);
+        var numberToken = MatchToken(SyntaxKind.NumberToken);
+        return new LiteralExpressionSyntax(numberToken);
     }
 }
 

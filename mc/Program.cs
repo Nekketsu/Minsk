@@ -1,6 +1,6 @@
 ﻿using Minsk.CodeAnalysis;
 
-bool showTree = false;
+var showTree = false;
 
 while (true)
 {
@@ -27,10 +27,9 @@ while (true)
 
     if (showTree)
     {
-        var color = Console.ForegroundColor;
         Console.ForegroundColor = ConsoleColor.DarkGray;
         PrettyPrint(syntaxTree.Root);
-        Console.ForegroundColor = color;
+        Console.ResetColor();
     }
 
     if (!syntaxTree.Diagnostics.Any())
@@ -41,7 +40,6 @@ while (true)
     }
     else
     {
-        var color = Console.ForegroundColor;
         Console.ForegroundColor = ConsoleColor.DarkRed;
 
         foreach (var diagnostic in syntaxTree.Diagnostics)
@@ -49,7 +47,7 @@ while (true)
             Console.WriteLine(diagnostic);
         }
 
-        Console.ForegroundColor = color;
+        Console.ResetColor();
     }
 }
 
@@ -69,7 +67,7 @@ static void PrettyPrint(SyntaxNode node, string indent = "", bool isLast = true)
 
     Console.WriteLine();
 
-    indent += isLast ? "    " : "│   ";
+    indent += isLast ? "   " : "│   ";
 
     var lastChild = node.GetChildren().LastOrDefault();
 
