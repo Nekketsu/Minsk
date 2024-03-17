@@ -1,3 +1,5 @@
+
+
 namespace Minsk.CodeAnalysis.Syntax;
 
 internal static class SyntaxFacts
@@ -29,6 +31,19 @@ internal static class SyntaxFacts
 
             default:
                 return 0;
+        }
+    }
+
+    public static SyntaxKind GetKeywordKind(string text)
+    {
+        switch (text)
+        {
+            case "true":
+                return SyntaxKind.TrueKeyword;
+            case "false":
+                return SyntaxKind.FalseKeyword;
+            default:
+                return SyntaxKind.IdentifierToken;
         }
     }
 }
