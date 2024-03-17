@@ -7,6 +7,8 @@ internal enum BoundBinaryOperatorKind
     Multiplicaiton,
     Division,
     LogicalAnd,
-    LogicalOr
+    LogicalOr,
+    Equals,
+    NotEquals
 }
 
