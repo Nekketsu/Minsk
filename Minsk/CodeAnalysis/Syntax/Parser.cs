@@ -4,7 +4,7 @@ internal sealed class Parser
 {
     private readonly SyntaxToken[] _tokens;
     private int _position;
-    private List<string> _diagnostics = new List<string>();
+    private DiagnosticBag _diagnostics = new DiagnosticBag();
 
     public Parser(string text)
     {
@@ -27,7 +27,7 @@ internal sealed class Parser
         _diagnostics.AddRange(lexer.Diagnostics);
     }
 
-    public IEnumerable<string> Diagnostics => _diagnostics;
+    public DiagnosticBag Diagnostics => _diagnostics;
 
     private SyntaxToken Peek(int offset)
     {
@@ -56,7 +56,7 @@ internal sealed class Parser
             return NextToken();
         }
 
-        _diagnostics.Add($"ERROR: Unespected token<{Current.Kind}>, expected <{kind}>");
+        _diagnostics.ReportUnexpectedToken(Current.Span, Current.Kind, kind);
         return new SyntaxToken(kind, Current.Position, null, null);
     }
 
