@@ -12,4 +12,3 @@ public struct TextSpan
     public int Length { get; }
     public int End => Start + Length;
 }
-
