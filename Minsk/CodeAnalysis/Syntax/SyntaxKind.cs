@@ -12,6 +12,7 @@ public enum SyntaxKind
     StarToken,
     SlashToken,
     BangToken,
+    EqualsToken,
     AmpersandAmpersandToken,
     PipePipeToken,
     EqualsEqualsToken,
@@ -26,8 +27,10 @@ public enum SyntaxKind
 
     // Expressions
     LiteralExpression,
+    NameExpression,
     UnaryExpression,
     BinaryExpression,
     ParenthesizedExpression,
+    AssignmentExpression,
 }
 
