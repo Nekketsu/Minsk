@@ -6,7 +6,7 @@ public class SyntaxFactsTests
 {
     [Theory]
     [MemberData(nameof(GetSyntaxKindData))]
-    public void SyntaxFacts_GetText_RoundTrip(SyntaxKind kind)
+    public void SyntaxFacts_GetText_RoundTrips(SyntaxKind kind)
     {
         var text = SyntaxFacts.GetText(kind);
         if (text is null)
