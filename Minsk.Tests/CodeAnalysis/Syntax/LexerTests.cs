@@ -4,6 +4,24 @@ namespace Minsk.Tests.CodeAnalysis.Syntax;
 
 public class LexerTests
 {
+    [Fact]
+    public void Lexer_Tests_AllTokens()
+    {
+        var fixedTokens = Enum.GetValues<SyntaxKind>()
+                               .Where(k => k.ToString().EndsWith("Keyword") ||
+                                           k.ToString().EndsWith("Token"))
+                               .ToList();
+
+        var testedTokenKinds = GetTokens().Concat(GetSeparators()).Select(t => t.kind);
+
+        var untestedTokenKinds = new SortedSet<SyntaxKind>();
+        untestedTokenKinds.Remove(SyntaxKind.BadToken);
+        untestedTokenKinds.Remove(SyntaxKind.EndOfFileToken);
+        untestedTokenKinds.ExceptWith(testedTokenKinds);
+
+        Assert.Empty(untestedTokenKinds);
+    }
+
     [Theory]
     [MemberData(nameof(GetTokensData))]
     public void Lexer_Lexes_Token(SyntaxKind kind, string text)
