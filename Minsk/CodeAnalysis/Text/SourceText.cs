@@ -71,7 +71,7 @@ public sealed class SourceText
             }
         }
 
-        if (position > lineStart)
+        if (position >= lineStart)
         {
             AddLine(result, sourceText, position, lineStart, 0);
         }
@@ -114,5 +114,5 @@ public sealed class SourceText
 
     public string ToString(int start, int length) => _text.Substring(start, length);
 
-    public string ToString(TextSpan span) => ToString(span.Start, span.Length);
+   public string ToString(TextSpan span) => ToString(span.Start, span.Length);
 }
