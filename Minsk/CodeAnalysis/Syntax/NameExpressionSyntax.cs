@@ -11,5 +11,3 @@ public sealed class NameExpressionSyntax : ExpressionSyntax
         public SyntaxToken IdentifierToken { get; }
         
     }
-
-
