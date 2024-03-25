@@ -49,6 +49,10 @@ public static class SyntaxFacts
         {
             case "true":
                 return SyntaxKind.TrueKeyword;
+            case "let":
+                return SyntaxKind.LetKeyword;
+            case "var":
+                return SyntaxKind.VarKeyword;
             case "false":
                 return SyntaxKind.FalseKeyword;
             default:
@@ -116,6 +120,10 @@ public static class SyntaxFacts
                 return "false";
             case SyntaxKind.TrueKeyword:
                 return "true";
+            case SyntaxKind.LetKeyword:
+                return "let";
+            case SyntaxKind.VarKeyword:
+                return "var";
             default:
                 return null;
         }
