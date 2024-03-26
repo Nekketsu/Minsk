@@ -27,7 +27,12 @@ public class EvaluationTests
     [InlineData("!true", false)]
     [InlineData("!false", true)]
     [InlineData("{ var a = 0 (a = 10) * a }", 100)]
-    public void Test(string text, object expectedValue)
+    public void Evaluator_Computes_CorrectValues(string text, object expectedValue)
+    {
+        AssertValue(text, expectedValue);
+    }
+
+    private static void AssertValue(string text, object expectedValue)
     {
         var syntaxTree = SyntaxTree.Parse(text);
         var compilation = new Compilation(syntaxTree);
