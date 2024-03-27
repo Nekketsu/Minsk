@@ -61,6 +61,8 @@ public static class SyntaxFacts
                 return SyntaxKind.LetKeyword;
             case "var":
                 return SyntaxKind.VarKeyword;
+            case "while":
+                return SyntaxKind.WhileKeyword;
             case "false":
                 return SyntaxKind.FalseKeyword;
             default:
@@ -144,6 +146,8 @@ public static class SyntaxFacts
                 return "let";
             case SyntaxKind.VarKeyword:
                 return "var";
+            case SyntaxKind.WhileKeyword:
+                return "while";
             default:
                 return null;
         }
