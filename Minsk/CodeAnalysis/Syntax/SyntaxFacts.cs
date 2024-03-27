@@ -51,8 +51,12 @@ public static class SyntaxFacts
     {
         switch (text)
         {
+            case "else":
+                return SyntaxKind.ElseKeyword;
             case "true":
                 return SyntaxKind.TrueKeyword;
+            case "if":
+                return SyntaxKind.IfKeyword;
             case "let":
                 return SyntaxKind.LetKeyword;
             case "var":
@@ -128,8 +132,12 @@ public static class SyntaxFacts
                 return "{";
             case SyntaxKind.CloseBraceToken:
                 return "}";
+            case SyntaxKind.ElseKeyword:
+                return "else";
             case SyntaxKind.FalseKeyword:
                 return "false";
+            case SyntaxKind.IfKeyword:
+                return "if";
             case SyntaxKind.TrueKeyword:
                 return "true";
             case SyntaxKind.LetKeyword:
