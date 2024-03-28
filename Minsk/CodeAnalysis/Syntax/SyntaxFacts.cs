@@ -30,6 +30,10 @@ public static class SyntaxFacts
 
             case SyntaxKind.EqualsEqualsToken:
             case SyntaxKind.BangEqualsToken:
+            case SyntaxKind.LessToken:
+            case SyntaxKind.LessOrEqualsToken:
+            case SyntaxKind.GreaterToken:
+            case SyntaxKind.GreaterOrEqualsToken:
                 return 3;
 
             case SyntaxKind.AmpersandAmpersandToken:
@@ -47,14 +51,24 @@ public static class SyntaxFacts
     {
         switch (text)
         {
-            case "true":
-                return SyntaxKind.TrueKeyword;
-            case "let":
-                return SyntaxKind.LetKeyword;
-            case "var":
-                return SyntaxKind.VarKeyword;
+            case "else":
+                return SyntaxKind.ElseKeyword;
             case "false":
                 return SyntaxKind.FalseKeyword;
+            case "for":
+                return SyntaxKind.ForKeyword;
+            case "if":
+                return SyntaxKind.IfKeyword;
+            case "let":
+                return SyntaxKind.LetKeyword;
+            case "true":
+                return SyntaxKind.TrueKeyword;
+            case "to":
+                return SyntaxKind.ToKeyword;
+            case "var":
+                return SyntaxKind.VarKeyword;
+            case "while":
+                return SyntaxKind.WhileKeyword;
             default:
                 return SyntaxKind.IdentifierToken;
         }
@@ -100,6 +114,14 @@ public static class SyntaxFacts
                 return "!";
             case SyntaxKind.EqualsToken:
                 return "=";
+            case SyntaxKind.LessToken:
+                return "<";
+            case SyntaxKind.LessOrEqualsToken:
+                return "<=";
+            case SyntaxKind.GreaterToken:
+                return ">";
+            case SyntaxKind.GreaterOrEqualsToken:
+                return ">=";
             case SyntaxKind.AmpersandAmpersandToken:
                 return "&&";
             case SyntaxKind.PipePipeToken:
@@ -116,14 +138,24 @@ public static class SyntaxFacts
                 return "{";
             case SyntaxKind.CloseBraceToken:
                 return "}";
+            case SyntaxKind.ElseKeyword:
+                return "else";
             case SyntaxKind.FalseKeyword:
                 return "false";
+            case SyntaxKind.ForKeyword:
+                return "for";
+            case SyntaxKind.IfKeyword:
+                return "if";
             case SyntaxKind.TrueKeyword:
                 return "true";
             case SyntaxKind.LetKeyword:
                 return "let";
+            case SyntaxKind.ToKeyword:
+                return "to";
             case SyntaxKind.VarKeyword:
                 return "var";
+            case SyntaxKind.WhileKeyword:
+                return "while";
             default:
                 return null;
         }

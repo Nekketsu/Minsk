@@ -32,25 +32,25 @@ internal sealed class DiagnosticBag : IEnumerable<Diagnostic>
     public void ReportBadCharacter(int position, char character)
     {
         var span = new TextSpan(position, 1);
-        var message = $"ERROR: bad character input: '{character}'.";
+        var message = $"Bad character input: '{character}'.";
         Report(span, message);
     }
 
     public void ReportUnexpectedToken(TextSpan span, SyntaxKind actualKind, SyntaxKind expectedKind)
     {
-        var message = $"ERROR: Unexpected token <{actualKind}>, expected <{expectedKind}>.";
+        var message = $"Unexpected token <{actualKind}>, expected <{expectedKind}>.";
         Report(span, message);
     }
 
     public void ReportUndefinedUnaryOperator(TextSpan span, string operatorText, Type operandType)
     {
-        var message = $"Unary operator '{operatorText}' is not defined for type {operandType}.";
+        var message = $"Unary operator '{operatorText}' is not defined for type '{operandType}'.";
         Report(span, message);
     }
 
     public void ReportUndefinedBinaryOperator(TextSpan span, string text, Type leftType, Type rightType)
     {
-        var message = $"Binary operator '{text}' is not defined for types {leftType} and {rightType}.";
+        var message = $"Binary operator '{text}' is not defined for types '{leftType}' and '{rightType}'.";
         Report(span, message);
     }
 
@@ -74,7 +74,7 @@ internal sealed class DiagnosticBag : IEnumerable<Diagnostic>
 
     public void ReportCannotAssign(TextSpan span, string name)
     {
-        var message = $"Variable '{name}' is read-only and cannot assigned to.";
+        var message = $"Variable '{name}' is read-only and cannot be assigned to.";
         Report(span, message);
     }
 }
