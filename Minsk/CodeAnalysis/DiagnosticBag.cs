@@ -32,13 +32,13 @@ internal sealed class DiagnosticBag : IEnumerable<Diagnostic>
     public void ReportBadCharacter(int position, char character)
     {
         var span = new TextSpan(position, 1);
-        var message = $"ERROR: bad character input: '{character}'.";
+        var message = $"Bad character input: '{character}'.";
         Report(span, message);
     }
 
     public void ReportUnexpectedToken(TextSpan span, SyntaxKind actualKind, SyntaxKind expectedKind)
     {
-        var message = $"ERROR: Unexpected token <{actualKind}>, expected <{expectedKind}>.";
+        var message = $"Unexpected token <{actualKind}>, expected <{expectedKind}>.";
         Report(span, message);
     }
 
