@@ -79,20 +79,36 @@ internal sealed class Lexer
                 _kind = SyntaxKind.CloseBraceToken;
                 _position++;
                 break;
+            case '~':
+                _kind = SyntaxKind.TildeToken;
+                _position++;
+                break;
+            case '^':
+                _kind = SyntaxKind.HatToken;
+                _position++;
+                break;
             case '&':
-                if (Lookahead == '&')
+                _position++;
+                if (Current != '&')
+                {
+                    _kind = SyntaxKind.AmpersandToken;
+                }
+                else
                 {
                     _kind = SyntaxKind.AmpersandAmpersandToken;
-                    _position += 2;
-                    break;
+                    _position++;
                 }
                 break;
             case '|':
-                if (Lookahead == '|')
+                _position++;
+                if (Current != '|')
+                {
+                    _kind = SyntaxKind.PipeToken;
+                }
+                else
                 {
                     _kind = SyntaxKind.PipePipeToken;
-                    _position += 2;
-                    break;
+                    _position++;
                 }
                 break;
             case '=':
@@ -103,8 +119,8 @@ internal sealed class Lexer
                 }
                 else
                 {
-                    _position++;
                     _kind = SyntaxKind.EqualsEqualsToken;
+                    _position++;
                 }
                 break;
             case '!':
