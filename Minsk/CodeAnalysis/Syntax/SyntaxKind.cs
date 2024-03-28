@@ -30,8 +30,10 @@ public enum SyntaxKind
     //Keywords
     ElseKeyword,
     FalseKeyword,
+    ForKeyword,
     IfKeyword,
     LetKeyword,
+    ToKeyword,
     TrueKeyword,
     VarKeyword,
     WhileKeyword,
@@ -45,6 +47,7 @@ public enum SyntaxKind
     VariableDeclaration,
     IfStatement,
     WhileStatement,
+    ForStatement,
     ExpressionStatement,
 
     // Expressions

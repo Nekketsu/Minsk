@@ -53,18 +53,22 @@ public static class SyntaxFacts
         {
             case "else":
                 return SyntaxKind.ElseKeyword;
-            case "true":
-                return SyntaxKind.TrueKeyword;
+            case "false":
+                return SyntaxKind.FalseKeyword;
+            case "for":
+                return SyntaxKind.ForKeyword;
             case "if":
                 return SyntaxKind.IfKeyword;
             case "let":
                 return SyntaxKind.LetKeyword;
+            case "true":
+                return SyntaxKind.TrueKeyword;
+            case "to":
+                return SyntaxKind.ToKeyword;
             case "var":
                 return SyntaxKind.VarKeyword;
             case "while":
                 return SyntaxKind.WhileKeyword;
-            case "false":
-                return SyntaxKind.FalseKeyword;
             default:
                 return SyntaxKind.IdentifierToken;
         }
@@ -138,12 +142,16 @@ public static class SyntaxFacts
                 return "else";
             case SyntaxKind.FalseKeyword:
                 return "false";
+            case SyntaxKind.ForKeyword:
+                return "for";
             case SyntaxKind.IfKeyword:
                 return "if";
             case SyntaxKind.TrueKeyword:
                 return "true";
             case SyntaxKind.LetKeyword:
                 return "let";
+            case SyntaxKind.ToKeyword:
+                return "to";
             case SyntaxKind.VarKeyword:
                 return "var";
             case SyntaxKind.WhileKeyword:
