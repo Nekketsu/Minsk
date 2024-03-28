@@ -127,6 +127,43 @@ public class EvaluationTests
     }
 
     [Fact]
+    public void Evaluator_IfStatement_Reports_CannotConvert()
+    {
+        var text = @"
+            {
+                var x = 0
+                if [10]
+                    x = 10
+            }
+        ";
+
+        var diagnostics = @"
+            Cannot convert type 'System.Int32' to 'System.Boolean'.
+        ";
+
+        AssertHasDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
+    public void Evaluator_WhileStatement_Reports_CannotConvert()
+    {
+        var text = @"
+            {
+                var x = 0
+                while [10]
+                    x = 10
+            }
+        ";
+
+        var diagnostics = @"
+            Cannot convert type 'System.Int32' to 'System.Boolean'.
+            Cannot convert type 'System.Boolean' to 'System.Int32'.
+        ";
+
+        AssertHasDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
     public void Evaluator_Unary_Reports_Undefined()
     {
         var text = @"[+]true";
