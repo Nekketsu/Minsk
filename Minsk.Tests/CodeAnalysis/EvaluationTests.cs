@@ -66,7 +66,23 @@ public class EvaluationTests
             Variable 'x' is already declared.
         ";
 
-        AssertHasDiagnostics(text, diagnostics);
+        AssertDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
+    public void Evaluator_BlockStatement_Reports_NoIniniteLoop()
+    {
+        var text = @"
+            {
+            [)][]
+        ";
+
+        var diagnostics = @"
+            Unexpected token <CloseParenthesisToken>, expected <IdentifierToken>.
+            Unexpected token <EndOfFileToken>, expected <CloseBraceToken>.
+        ";
+
+        AssertDiagnostics(text, diagnostics);
     }
 
     [Fact]
@@ -84,7 +100,7 @@ public class EvaluationTests
             Cannot convert type 'System.Int32' to 'System.Boolean'.
         ";
 
-        AssertHasDiagnostics(text, diagnostics);
+        AssertDiagnostics(text, diagnostics);
     }
 
     [Fact]
@@ -102,7 +118,7 @@ public class EvaluationTests
             Cannot convert type 'System.Int32' to 'System.Boolean'.
         ";
 
-        AssertHasDiagnostics(text, diagnostics);
+        AssertDiagnostics(text, diagnostics);
     }
 
     [Fact]
@@ -120,7 +136,7 @@ public class EvaluationTests
             Cannot convert type 'System.Boolean' to 'System.Int32'.
         ";
 
-        AssertHasDiagnostics(text, diagnostics);
+        AssertDiagnostics(text, diagnostics);
     }
 
     [Fact]
@@ -138,7 +154,7 @@ public class EvaluationTests
             Cannot convert type 'System.Boolean' to 'System.Int32'.
         ";
 
-        AssertHasDiagnostics(text, diagnostics);
+        AssertDiagnostics(text, diagnostics);
     }
 
     [Fact]
@@ -150,7 +166,7 @@ public class EvaluationTests
             Variable 'x' doesn't exist.
         ";
 
-        AssertHasDiagnostics(text, diagnostics);
+        AssertDiagnostics(text, diagnostics);
     }
 
     [Fact]
@@ -162,7 +178,7 @@ public class EvaluationTests
             Unexpected token <EndOfFileToken>, expected <IdentifierToken>.
         ";
 
-        AssertHasDiagnostics(text, diagnostics);
+        AssertDiagnostics(text, diagnostics);
     }
 
     [Fact]
@@ -174,7 +190,7 @@ public class EvaluationTests
             Unary operator '+' is not defined for type 'System.Boolean'.
         ";
 
-        AssertHasDiagnostics(text, diagnostics);
+        AssertDiagnostics(text, diagnostics);
     }
 
     [Fact]
@@ -186,7 +202,7 @@ public class EvaluationTests
             Binary operator '*' is not defined for types 'System.Int32' and 'System.Boolean'.
         ";
 
-        AssertHasDiagnostics(text, diagnostics);
+        AssertDiagnostics(text, diagnostics);
     }
 
     [Fact]
@@ -198,7 +214,7 @@ public class EvaluationTests
             Variable 'x' doesn't exist.
         ";
 
-        AssertHasDiagnostics(text, diagnostics);
+        AssertDiagnostics(text, diagnostics);
     }
 
     [Fact]
@@ -215,7 +231,7 @@ public class EvaluationTests
             Variable 'x' is read-only and cannot be assigned to.
         ";
 
-        AssertHasDiagnostics(text, diagnostics);
+        AssertDiagnostics(text, diagnostics);
     }
 
     [Fact]
@@ -232,7 +248,7 @@ public class EvaluationTests
             Cannot convert type 'System.Boolean' to 'System.Int32'.
         ";
 
-        AssertHasDiagnostics(text, diagnostics);
+        AssertDiagnostics(text, diagnostics);
     }
 
     private static void AssertValue(string text, object expectedValue)
@@ -246,7 +262,7 @@ public class EvaluationTests
         Assert.Equal(expectedValue, result.Value);
     }
 
-    private void AssertHasDiagnostics(string text, string diagnosticText)
+    private void AssertDiagnostics(string text, string diagnosticText)
     {
         var annotatedText = AnnotatedText.Parse(text);
         var syntaxtTree = SyntaxTree.Parse(annotatedText.Text);
