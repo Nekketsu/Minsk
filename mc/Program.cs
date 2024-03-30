@@ -71,10 +71,6 @@ while (true)
         ? new Compilation(syntaxTree)
         : previous.ContinueWith(syntaxTree);
 
-    var result = compilation.Evaluate(variables);
-
-    var diagnostics = result.Diagnostics;
-
     if (showTree)
     {
         syntaxTree.Root.WriteTo(Console.Out);
@@ -85,7 +81,9 @@ while (true)
         compilation.EmitTree(Console.Out);
     }
 
-    if (!diagnostics.Any())
+    var result = compilation.Evaluate(variables);
+
+    if (!result.Diagnostics.Any())
     {
         Console.ForegroundColor = ConsoleColor.Magenta;
         Console.WriteLine(result.Value);
@@ -94,7 +92,7 @@ while (true)
     }
     else
     {
-        foreach (var diagnostic in diagnostics)
+        foreach (var diagnostic in result.Diagnostics)
         {
             var lineIndex = syntaxTree.Text.GetLineIndex(diagnostic.Span.Start);
             var line = syntaxTree.Text.Lines[lineIndex];
