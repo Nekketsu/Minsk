@@ -8,12 +8,15 @@ internal enum BoundNodeKind
     IfStatement,
     WhileStatement,
     ForStatement,
+    LabelStatement,
+    GotoStatement,
+    ConditionalGotoStatement,
     ExpressionStatement,
 
     // Expressions
     LiteralExpression,
-    UnaryExpression,
-    AssignmentExpression,
-    BinaryExpression,
     VariableExpression,
+    AssignmentExpression,
+    UnaryExpression,
+    BinaryExpression,
 }

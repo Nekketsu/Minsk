@@ -16,6 +16,7 @@ public abstract class SyntaxNode
             return TextSpan.FromBounds(first.Start, last.End);
         }
     }
+
     public IEnumerable<SyntaxNode> GetChildren()
     {
         var properties = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -54,13 +55,12 @@ public abstract class SyntaxNode
         var isToConsole = writer == Console.Out;
         var marker = isLast ? "└──" : "├──";
 
-        writer.Write(indent);
-
         if (isToConsole)
         {
             Console.ForegroundColor = ConsoleColor.DarkGray;
         }
 
+        writer.Write(indent);
         writer.Write(marker);
 
         if (isToConsole)
