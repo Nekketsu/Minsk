@@ -79,7 +79,7 @@ internal abstract class Repl
 
                 Console.ResetColor();
                 _lineRenderer(line);
-                Console.WriteLine(new string(' ', Console.WindowWidth - line.Length));
+                Console.WriteLine(new string(' ', Console.WindowWidth - line.Length - 2));
                 lineCount++;
             }
 
