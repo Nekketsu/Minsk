@@ -67,23 +67,14 @@ internal sealed class MinskRepl : Repl
         }
 
         var syntaxTree = SyntaxTree.Parse(text);
-        if (GetLastToken(syntaxTree.Root.Statement).IsMissing)
+
+        // Use Statement because we need to exclude the EndOfFileToken.
+        if (syntaxTree.Root.Statement.GetLastToken().IsMissing)
         {
             return false;
         }
 
         return true;
-    }
-
-    private static SyntaxToken GetLastToken(SyntaxNode node)
-    {
-        if (node is SyntaxToken token)
-        {
-            return token;
-        }
-
-        // A syntax node should always contain at least 1 token.
-        return GetLastToken(node.GetChildren().Last());
     }
 
     protected override void EvaluateSubmission(string text)
