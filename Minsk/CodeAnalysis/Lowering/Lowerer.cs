@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Minsk.CodeAnalysis.Binding;
+using Minsk.CodeAnalysis.Symbols;
 using Minsk.CodeAnalysis.Syntax;
 
 namespace Minsk.CodeAnalysis.Lowering;
