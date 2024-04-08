@@ -245,6 +245,9 @@ internal sealed class Parser
             case SyntaxKind.NumberToken:
                 return ParseNumberLiteral();
 
+            case SyntaxKind.StringToken:
+                return ParseStringLiteral();
+
             default:
                 return ParseNameExpression();
         }
@@ -269,6 +272,12 @@ internal sealed class Parser
     {
         var numberToken = MatchToken(SyntaxKind.NumberToken);
         return new LiteralExpressionSyntax(numberToken);
+    }
+
+    private ExpressionSyntax ParseStringLiteral()
+    {
+        var stringToken = MatchToken(SyntaxKind.StringToken);
+        return new LiteralExpressionSyntax(stringToken);
     }
 
     private ExpressionSyntax ParseNameExpression()
