@@ -6,6 +6,7 @@ public class LexerTests
 {
     [Fact]
     public void Lexer_Tests_AllTokens()
+    public void Lexer_Covers_AllTokens()
     {
         var fixedTokens = Enum.GetValues<SyntaxKind>()
                                .Where(k => k.ToString().EndsWith("Keyword") ||
