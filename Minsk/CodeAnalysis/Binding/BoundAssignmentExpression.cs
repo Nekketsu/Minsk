@@ -15,4 +15,3 @@ internal sealed class BoundAssignmentExpression : BoundExpression
     public VariableSymbol Variable { get; }
     public BoundExpression Expression { get; }
 }
-
