@@ -98,15 +98,9 @@ internal sealed class Binder
 
     private BoundStatement BindVariableDeclaration(VariableDeclarationSyntax syntax)
     {
-        var name = syntax.Identifier.Text;
         var isReadOnly = syntax.Keyword.Kind == SyntaxKind.LetKeyword;
         var initializer = BindExpression(syntax.Initializer);
-        var variable = new VariableSymbol(name, isReadOnly, initializer.Type);
-
-        if (!_scope.TryDeclare(variable))
-        {
-            _diagnostics.ReportVariableAlreadyDeclared(syntax.Identifier.Span, name);
-        }
+        var variable = BindVariable(syntax.Identifier, isReadOnly, initializer.Type);
 
         return new BoundVariableDeclaration(variable, initializer);
     }
@@ -133,13 +127,7 @@ internal sealed class Binder
 
         _scope = new BoundScope(_scope);
 
-        var name = syntax.Identifier.Text;
-        var variable = new VariableSymbol(name, true, TypeSymbol.Int);
-        if (!_scope.TryDeclare(variable))
-        {
-            _diagnostics.ReportVariableAlreadyDeclared(syntax.Identifier.Span, name);
-        }
-
+        var variable = BindVariable(syntax.Identifier, isReadOnly: true, TypeSymbol.Int);
         var body = BindStatement(syntax.Body);
 
         _scope = _scope.Parent;
@@ -201,7 +189,7 @@ internal sealed class Binder
     private BoundExpression BindNameExpression(NameExpressionSyntax syntax)
     {
         var name = syntax.IdentifierToken.Text;
-        if (string.IsNullOrEmpty(name))
+        if (syntax.IdentifierToken.IsMissing)
         {
             // This means the token the token was interted by the parser. We already
             // reported error so we can just return an error expression.
@@ -282,5 +270,19 @@ internal sealed class Binder
         }
 
         return new BoundBinaryExpression(boundLeft, boundOperatorKind, boundRight);
+    }
+
+    private VariableSymbol BindVariable(SyntaxToken identifier, bool isReadOnly, TypeSymbol type)
+    {
+        var name = identifier.Text ?? "?";
+        var declare = !identifier.IsMissing;
+        var variable = new VariableSymbol(name, isReadOnly, type);
+
+        if (declare && !_scope.TryDeclare(variable))
+        {
+            _diagnostics.ReportVariableAlreadyDeclared(identifier.Span, name);
+        }
+
+        return variable;
     }
 }
