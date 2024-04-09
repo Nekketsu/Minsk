@@ -20,6 +20,7 @@ internal sealed class MinskRepl : Repl
             var isKeyword = token.Kind.ToString().EndsWith("Keyword");
             var isNumber = token.Kind == SyntaxKind.NumberToken;
             var isIdentifier = token.Kind == SyntaxKind.IdentifierToken;
+            var isString = token.Kind == SyntaxKind.StringToken;
 
             if (isKeyword)
             {
@@ -32,6 +33,10 @@ internal sealed class MinskRepl : Repl
             else if (isNumber)
             {
                 Console.ForegroundColor = ConsoleColor.Cyan;
+            }
+            else if (isString)
+            {
+                Console.ForegroundColor = ConsoleColor.Magenta;
             }
             else
             {
@@ -120,7 +125,7 @@ internal sealed class MinskRepl : Repl
 
         if (!result.Diagnostics.Any())
         {
-            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(result.Value);
             Console.ResetColor();
             _previous = compilation;
