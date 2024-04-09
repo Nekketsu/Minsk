@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Minsk.CodeAnalysis.Binding;
+using Minsk.CodeAnalysis.Symbols;
 using Minsk.CodeAnalysis.Syntax;
 
 namespace Minsk.CodeAnalysis.Lowering;
@@ -13,10 +14,10 @@ internal sealed class Lowerer : BoundTreeRewriter
 
     }
 
-    private LabelSymbol GenerateLabel()
+    private BoundLabel GenerateLabel()
     {
         var name = $"Label{ ++_labelCount }";
-        return new LabelSymbol(name);
+        return new BoundLabel(name);
     }
 
     public static BoundBlockStatement Lower(BoundStatement statement)
@@ -158,11 +159,11 @@ internal sealed class Lowerer : BoundTreeRewriter
         // }
         var variableDeclaration = new BoundVariableDeclaration(node.Variable, node.LowerBound);
         var variableExpression = new BoundVariableExpression(node.Variable);
-        var upperBoundSymbol = new VariableSymbol("upperBound", true, typeof(int));
+        var upperBoundSymbol = new VariableSymbol("upperBound", true, TypeSymbol.Int);
         var upperBoundDeclaration = new BoundVariableDeclaration(upperBoundSymbol, node.UpperBound);
         var condition = new BoundBinaryExpression(
             new BoundVariableExpression(node.Variable),
-            BoundBinaryOperator.Bind(SyntaxKind.LessOrEqualsToken, typeof(int), typeof(int)),
+            BoundBinaryOperator.Bind(SyntaxKind.LessOrEqualsToken, TypeSymbol.Int, TypeSymbol.Int),
             new BoundVariableExpression(upperBoundSymbol)
         );
 
@@ -171,7 +172,7 @@ internal sealed class Lowerer : BoundTreeRewriter
                 node.Variable,
                 new BoundBinaryExpression(
                     variableExpression,
-                    BoundBinaryOperator.Bind(SyntaxKind.PlusToken, typeof(int), typeof(int)),
+                    BoundBinaryOperator.Bind(SyntaxKind.PlusToken, TypeSymbol.Int, TypeSymbol.Int),
                     new BoundLiteralExpression(1)
                 )
             )

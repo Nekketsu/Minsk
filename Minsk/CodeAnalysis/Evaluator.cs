@@ -1,4 +1,5 @@
 using Minsk.CodeAnalysis.Binding;
+using Minsk.CodeAnalysis.Symbols;
 
 namespace Minsk.CodeAnalysis;
 
@@ -17,7 +18,7 @@ internal sealed class Evaluator
 
     public object Evaluate()
     {
-        var labelToIndex = new Dictionary<LabelSymbol, int>();
+        var labelToIndex = new Dictionary<BoundLabel, int>();
 
         for (var i = 0; i < _root.Statements.Length; i++)
         {
@@ -153,7 +154,7 @@ internal sealed class Evaluator
             case BoundBinaryOperatorKind.Division:
                 return (int)left / (int)right;
             case BoundBinaryOperatorKind.BitwiseAnd:
-                if (b.Type == typeof(int))
+                if (b.Type == TypeSymbol.Int)
                 {
                     return (int)left & (int)right;
                 }
@@ -162,7 +163,7 @@ internal sealed class Evaluator
                     return (bool)left & (bool)right;
                 }
             case BoundBinaryOperatorKind.BitwiseOr:
-                if (b.Type == typeof(int))
+                if (b.Type == TypeSymbol.Int)
                 {
                     return (int)left | (int)right;
                 }
@@ -171,7 +172,7 @@ internal sealed class Evaluator
                     return (bool)left | (bool)right;
                 }
             case BoundBinaryOperatorKind.BitwiseXor:
-                if (b.Type == typeof(int))
+                if (b.Type == TypeSymbol.Int)
                 {
                     return (int)left ^ (int)right;
                 }
