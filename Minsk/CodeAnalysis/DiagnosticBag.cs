@@ -84,5 +84,29 @@ internal sealed class DiagnosticBag : IEnumerable<Diagnostic>
         var message = $"Unterminated string literal.";
         Report(span, message);
     }
+
+    public void ReportUndefinedFunction(TextSpan span, string name)
+    {
+        var message = $"Function '{name}' doesn't exist.";
+        Report(span, message);
+    }
+
+    public void ReportWrontArgumentCount(TextSpan span, string name, int expectedCount, int actualCount)
+    {
+        var message = $"Function '{name}' requires {expectedCount} arguments but was given {actualCount}.";
+        Report(span, message);
+    }
+
+    public void ReportWrontArgumentType(TextSpan span, string name, string parameterName, TypeSymbol expectedType, TypeSymbol actualType)
+    {
+        var message = $"Parameter '{name}' requires a value of type '{expectedType}' but was given a value of type '{actualType}'.";
+        Report(span, message);
+    }
+
+    public void ReportExpressionMustHaveValue(TextSpan span)
+    {
+        var message = "Expression must have a value.";
+        Report(span, message);
+    }
 }
 
