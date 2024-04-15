@@ -21,4 +21,5 @@ internal enum BoundNodeKind
     UnaryExpression,
     BinaryExpression,
     CallExpression,
+    ConversionExpression,
 }
