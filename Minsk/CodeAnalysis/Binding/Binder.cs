@@ -83,6 +83,8 @@ internal sealed class Binder
                 return BindIfStatement((IfStatementSyntax)syntax);
             case SyntaxKind.WhileStatement:
                 return BindWhileStatement((WhileStatementSyntax)syntax);
+            case SyntaxKind.DoWhileStatement:
+                return DoBindWhileStatement((DoWhileStatementSyntax)syntax);
             case SyntaxKind.ForStatement:
                 return BindForStatement((ForStatementSyntax)syntax);
             case SyntaxKind.ExpressionStatement:
@@ -123,6 +125,13 @@ internal sealed class Binder
         var thenStatement = BindStatement(syntax.ThenStatement);
         var elseStatement = syntax.ElseClause is null ? null : BindStatement(syntax.ElseClause.ElseStatement);
         return new BoundIfStatement(condition, thenStatement, elseStatement);
+    }
+
+    private BoundStatement DoBindWhileStatement(DoWhileStatementSyntax syntax)
+    {
+        var body = BindStatement(syntax.Body);
+        var condition = BindExpression(syntax.Condition, TypeSymbol.Bool);
+        return new BoundDoWhileStatement(body, condition);
     }
 
     private BoundStatement BindWhileStatement(WhileStatementSyntax syntax)

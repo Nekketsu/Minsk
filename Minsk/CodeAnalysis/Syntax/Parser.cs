@@ -87,6 +87,8 @@ internal sealed class Parser
                 return ParseForStatement();
             case SyntaxKind.WhileKeyword:
                 return ParseWhileStatement();
+            case SyntaxKind.DoKeyword:
+                return ParseDoWhileStatement();
             default:
                 return ParseExpressionStatement();
         }
@@ -153,6 +155,15 @@ internal sealed class Parser
         var keyword = NextToken();
         var statement = ParseStatement();
         return new ElseClauseSyntax(keyword, statement);
+    }
+
+    private StatementSyntax ParseDoWhileStatement()
+    {
+        var doKeyword = MatchToken(SyntaxKind.DoKeyword);
+        var body = ParseStatement();
+        var whileKeyword = MatchToken(SyntaxKind.WhileKeyword);
+        var condition = ParseExpression();
+        return new DoWhileStatementSyntax(doKeyword, body, whileKeyword, condition);
     }
 
     private StatementSyntax ParseWhileStatement()
