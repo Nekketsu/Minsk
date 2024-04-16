@@ -73,6 +73,8 @@ public static class SyntaxFacts
                 return SyntaxKind.VarKeyword;
             case "while":
                 return SyntaxKind.WhileKeyword;
+            case "do":
+                return SyntaxKind.DoKeyword;
             default:
                 return SyntaxKind.IdentifierToken;
         }
@@ -150,6 +152,8 @@ public static class SyntaxFacts
                 return "{";
             case SyntaxKind.CloseBraceToken:
                 return "}";
+            case SyntaxKind.CommaToken:
+                return ",";
             case SyntaxKind.ElseKeyword:
                 return "else";
             case SyntaxKind.FalseKeyword:
@@ -168,6 +172,8 @@ public static class SyntaxFacts
                 return "var";
             case SyntaxKind.WhileKeyword:
                 return "while";
+            case SyntaxKind.DoKeyword:
+                return "do";
             default:
                 return null;
         }

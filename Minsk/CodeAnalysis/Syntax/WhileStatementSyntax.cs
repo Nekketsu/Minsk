@@ -14,4 +14,3 @@ public sealed class WhileStatementSyntax : StatementSyntax
     public ExpressionSyntax Condition { get; }
     public StatementSyntax Body { get; }
 }
-

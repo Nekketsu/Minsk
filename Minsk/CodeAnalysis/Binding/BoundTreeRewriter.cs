@@ -16,6 +16,8 @@ internal abstract class BoundTreeRewriter
                 return RewriteIfStatement((BoundIfStatement)node);
             case BoundNodeKind.WhileStatement:
                 return RewriteWhileStatement((BoundWhileStatement)node);
+            case BoundNodeKind.DoWhileStatement:
+                return RewriteDoWhileStatement((BoundDoWhileStatement)node);
             case BoundNodeKind.ForStatement:
                 return RewriteForStatement((BoundForStatement)node);
             case BoundNodeKind.LabelStatement:
@@ -33,7 +35,7 @@ internal abstract class BoundTreeRewriter
 
     protected virtual BoundStatement RewriteBlockStatement(BoundBlockStatement node)
     {
-        ImmutableArray<BoundStatement>.Builder builder = null;
+        ImmutableArray<BoundStatement>.Builder? builder = null;
 
         for (var i = 0; i < node.Statements.Length; i++)
         {
@@ -88,6 +90,18 @@ internal abstract class BoundTreeRewriter
         }
 
         return new BoundIfStatement(condition, thenStatement, elseStatement);
+    }
+
+    protected virtual BoundStatement RewriteDoWhileStatement(BoundDoWhileStatement node)
+    {
+        var body = RewriteStatement(node.Body);
+        var condition = RewriteExpression(node.Condition);
+        if (body == node.Body && condition == node.Condition)
+        {
+            return node;
+        }
+
+        return new BoundDoWhileStatement(body, condition);
     }
 
     protected virtual BoundStatement RewriteWhileStatement(BoundWhileStatement node)
@@ -163,6 +177,10 @@ internal abstract class BoundTreeRewriter
                 return RewriteBinaryExpression((BoundBinaryExpression)node);
             case BoundNodeKind.VariableExpression:
                 return RewriteVariableExpression((BoundVariableExpression)node);
+            case BoundNodeKind.CallExpression:
+                return RewriteCallExpression((BoundCallExpression)node);
+            case BoundNodeKind.ConversionExpression:
+                return RewriteConversionExpression((BoundConversionExpression)node);
             default:
                 throw new Exception($"Unexpected node: {node.Kind}");
         }
@@ -215,5 +233,51 @@ internal abstract class BoundTreeRewriter
         }
 
         return new BoundBinaryExpression(left, node.Op, right);
+    }
+
+    protected virtual BoundExpression RewriteCallExpression(BoundCallExpression node)
+    {
+        ImmutableArray<BoundExpression>.Builder? builder = null;
+
+        for (var i = 0; i < node.Arguments.Length; i++)
+        {
+            var oldArgument = node.Arguments[i];
+            var newArgument = RewriteExpression(oldArgument);
+            if (newArgument != oldArgument)
+            {
+                if (builder is null)
+                {
+                    builder = ImmutableArray.CreateBuilder<BoundExpression>(node.Arguments.Length);
+
+                    for (var j = 0; j < i; j++)
+                    {
+                        builder.Add(node.Arguments[j]);
+                    }
+                }
+            }
+
+            if (builder is not null)
+            {
+                builder.Add(newArgument);
+            }
+        }
+
+        if (builder is null)
+        {
+            return node;
+        }
+
+        return new BoundCallExpression(node.Function, builder.MoveToImmutable());
+    }
+
+    protected virtual BoundExpression RewriteConversionExpression(BoundConversionExpression node)
+    {
+        var expression = RewriteExpression(node.Expression);
+        if (expression == node.Expression)
+        {
+            return node;
+        }
+
+        return new BoundConversionExpression(node.Type, expression);
     }
 }

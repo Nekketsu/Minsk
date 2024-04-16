@@ -7,6 +7,7 @@ internal enum BoundNodeKind
     VariableDeclaration,
     IfStatement,
     WhileStatement,
+    DoWhileStatement,
     ForStatement,
     LabelStatement,
     GotoStatement,
@@ -20,4 +21,6 @@ internal enum BoundNodeKind
     AssignmentExpression,
     UnaryExpression,
     BinaryExpression,
+    CallExpression,
+    ConversionExpression,
 }
