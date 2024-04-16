@@ -5,8 +5,7 @@ namespace Minsk.CodeAnalysis.Binding;
 
 internal sealed class BoundScope
 {
-    private Dictionary<string, VariableSymbol>? _variables;
-    private Dictionary<string, FunctionSymbol>? _functions;
+    private Dictionary<string, Symbol>? _symbols;
 
     public BoundScope(BoundScope? parent)
     {
@@ -15,29 +14,44 @@ internal sealed class BoundScope
 
     public BoundScope? Parent { get; }
 
-    public bool TryDeclareVariable(VariableSymbol variable)
+    public bool TryDeclareVariable(VariableSymbol variable) => TryDeclareSymbol(variable);
+
+    public bool TryDeclareFunction(FunctionSymbol function) => TryDeclareSymbol(function);
+
+    private bool TryDeclareSymbol<TSymbol>(TSymbol symbol)
+        where TSymbol : Symbol
     {
-        if (_variables is null)
+        if (_symbols is null)
         {
-            _variables = new Dictionary<string, VariableSymbol>();
+            _symbols = new Dictionary<string, Symbol>();
+        }
+        else if (_symbols.ContainsKey(symbol.Name))
+        {
+            return false;
         }
 
-        if (_variables.ContainsKey(variable.Name))
-        {
-             return false;
-        }
-
-        _variables.Add(variable.Name, variable);
+        _symbols.Add(symbol.Name, symbol);
         return true;
     }
 
-    public bool TryLookupVariable(string name, out VariableSymbol? variable)
-    {
-        variable = null;
+    public bool TryLookupVariable(string name, out VariableSymbol? variable) => TryLookupSymbol(name, out variable);
 
-        if (_variables is not null && _variables.TryGetValue(name, out variable))
+    public bool TryLookupFunction(string name, out FunctionSymbol? function) => TryLookupSymbol(name, out function);
+
+    private bool TryLookupSymbol<TSymbol>(string name, out TSymbol symbol)
+        where TSymbol : Symbol
+    {
+        symbol = null;
+
+        if (_symbols is not null && _symbols.TryGetValue(name, out var declaredSymbol))
         {
-            return true;
+            if (declaredSymbol is TSymbol matchingSymbol)
+            {
+                symbol = matchingSymbol;
+                return true;
+            }
+
+            return false;
         }
 
         if (Parent is null)
@@ -45,58 +59,21 @@ internal sealed class BoundScope
             return false;
         }
 
-        return Parent.TryLookupVariable(name, out variable);
+        return Parent.TryLookupSymbol(name, out symbol);
     }
 
-    public bool TryDeclareFunction(FunctionSymbol function)
+    public ImmutableArray<VariableSymbol> GetDeclaredVariables() => GetDeclaredSymbols<VariableSymbol>();
+
+    public ImmutableArray<FunctionSymbol> GetDeclaredFunctions() => GetDeclaredSymbols<FunctionSymbol>();
+
+    private ImmutableArray<TSymbol> GetDeclaredSymbols<TSymbol>()
+        where TSymbol : Symbol
     {
-        if (_functions is null)
+        if (_symbols is null)
         {
-            _functions = new Dictionary<string, FunctionSymbol>();
-        }
-        if (_functions.ContainsKey(function.Name))
-        {
-             return false;
+            return ImmutableArray<TSymbol>.Empty;
         }
 
-        _functions.Add(function.Name, function);
-        return true;
-    }
-
-    public bool TryLookupFunction(string name, out FunctionSymbol? function)
-    {
-        function = null;
-
-        if (_functions is not null && _functions.TryGetValue(name, out function))
-        {
-            return true;
-        }
-
-        if (Parent is null)
-        {
-            return false;
-        }
-
-        return Parent.TryLookupFunction(name, out function);
-    }
-
-    public ImmutableArray<VariableSymbol> GetDeclaredVariables()
-    {
-        if (_variables is null)
-        {
-            return ImmutableArray<VariableSymbol>.Empty;
-        }
-
-        return _variables.Values.ToImmutableArray();
-    }
-
-    public ImmutableArray<FunctionSymbol> GetDeclaredFunctions()
-    {
-        if (_functions is null)
-        {
-            return ImmutableArray<FunctionSymbol>.Empty;
-        }
-
-        return _functions.Values.ToImmutableArray();
+        return _symbols.Values.OfType<TSymbol>().ToImmutableArray();
     }
 }

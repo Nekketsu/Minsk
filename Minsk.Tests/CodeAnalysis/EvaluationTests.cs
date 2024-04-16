@@ -90,7 +90,7 @@ public class EvaluationTests
         ";
 
         var diagnostics = @"
-            Variable 'x' is already declared.
+            'x' is already declared.
         ";
 
         AssertDiagnostics(text, diagnostics);
@@ -292,6 +292,23 @@ public class EvaluationTests
 
         var diagnostics = @"
             Cannot convert type 'bool' to 'int'.
+        ";
+
+        AssertDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
+    public void Evaluator_Variables_Can_Shadow_Functions()
+    {
+        var text = @"
+            {
+                let print = 42
+                [print](""test"")
+            }
+        ";
+
+        var diagnostics = @"
+            Function 'print' doesn't exist.
         ";
 
         AssertDiagnostics(text, diagnostics);
