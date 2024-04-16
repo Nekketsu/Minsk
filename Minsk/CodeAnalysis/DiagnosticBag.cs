@@ -61,9 +61,21 @@ internal sealed class DiagnosticBag : IEnumerable<Diagnostic>
         Report(span, message);
     }
 
+    public void ReportUndefinedType(TextSpan span, string name)
+    {
+        var message = $"Type '{name}' doesn't exists.";
+        Report(span, message);
+    }
+
     public void ReportCannotConvert(TextSpan span, TypeSymbol fromType, TypeSymbol toType)
     {
         var message = $"Cannot convert type '{fromType}' to '{toType}'.";
+        Report(span, message);
+    }
+
+    public void ReportCannotConvertImplicitly(TextSpan span, TypeSymbol fromType, TypeSymbol toType)
+    {
+        var message = $"Cannot convert type '{fromType}' to '{toType}'. An explicit conversion exists (are you missing a cast?)";
         Report(span, message);
     }
 
@@ -91,13 +103,13 @@ internal sealed class DiagnosticBag : IEnumerable<Diagnostic>
         Report(span, message);
     }
 
-    public void ReportWrontArgumentCount(TextSpan span, string name, int expectedCount, int actualCount)
+    public void ReportWrongArgumentCount(TextSpan span, string name, int expectedCount, int actualCount)
     {
         var message = $"Function '{name}' requires {expectedCount} arguments but was given {actualCount}.";
         Report(span, message);
     }
 
-    public void ReportWrontArgumentType(TextSpan span, string name, string parameterName, TypeSymbol expectedType, TypeSymbol actualType)
+    public void ReportWrongArgumentType(TextSpan span, string name, string parameterName, TypeSymbol expectedType, TypeSymbol actualType)
     {
         var message = $"Parameter '{name}' requires a value of type '{expectedType}' but was given a value of type '{actualType}'.";
         Report(span, message);
