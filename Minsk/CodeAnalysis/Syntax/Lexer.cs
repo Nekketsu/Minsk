@@ -231,6 +231,7 @@ internal sealed class Lexer
                 case '"':
                     if (Lookahead == '"')
                     {
+                        sb.Append(Current);
                         _position += 2;
                     }
                     else
