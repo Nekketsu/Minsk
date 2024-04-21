@@ -57,21 +57,14 @@ public class Compilation
             return new EvaluationResult(program.Diagnostics.ToImmutableArray(), null);
         }
 
-        var statement = GetStatement();
-        var evaluator = new Evaluator(program.FunctionBodies, statement, variables);
+        var evaluator = new Evaluator(program, variables);
         var value = evaluator.Evaluate();
         return new EvaluationResult(ImmutableArray<Diagnostic>.Empty, value);
     }
 
     public void EmitTree(TextWriter writer)
     {
-        var statement = GetStatement();
-        statement.WriteTo(writer);
-    }
-
-    private BoundBlockStatement GetStatement()
-    {
-        var result = GlobalScope.Statement;
-        return Lowerer.Lower(result);
+        var program = Binder.BindProgram(GlobalScope);
+        program.Statement.WriteTo(writer);
     }
 }

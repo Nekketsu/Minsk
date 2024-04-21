@@ -36,15 +36,13 @@ internal sealed class Binder
             binder.BindFunctionDeclaration(function);
         }
 
-        var statementBuilder = ImmutableArray.CreateBuilder<BoundStatement>();
+        var statements = ImmutableArray.CreateBuilder<BoundStatement>();
 
         foreach (var globalStatement in syntax.Members.OfType<GlobalStatementSyntax>())
         {
-            var s = binder.BindStatement(globalStatement.Statement);
-            statementBuilder.Add(s);
+            var statement = binder.BindStatement(globalStatement.Statement);
+            statements.Add(statement);
         }
-
-        var statement = new BoundBlockStatement(statementBuilder.ToImmutable());
 
         var functions = binder._scope.GetDeclaredFunctions();
         var variables = binder._scope.GetDeclaredVariables();
@@ -55,7 +53,7 @@ internal sealed class Binder
             diagnostics = diagnostics.InsertRange(0, previous.Diagnostics);
         }
 
-        return new BoundGlobalScope(previous, diagnostics, functions, variables, statement);
+        return new BoundGlobalScope(previous, diagnostics, functions, variables, statements.ToImmutable());
     }
 
     public static BoundProgram BindProgram(BoundGlobalScope globalScope)
@@ -63,9 +61,10 @@ internal sealed class Binder
         var parentScope = CreateParentScope(globalScope);
 
         var functionBodies = ImmutableDictionary.CreateBuilder<FunctionSymbol, BoundBlockStatement>();
-        var diagnostics = new DiagnosticBag();
+        var diagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
 
         var scope = globalScope;
+
         while (scope is not null)
         {
             foreach (var function in scope.Functions)
@@ -81,7 +80,9 @@ internal sealed class Binder
             scope = scope.Previous;
         }
 
-        return new BoundProgram(globalScope, diagnostics, functionBodies.ToImmutable());
+        var statement = Lowerer.Lower(new BoundBlockStatement(globalScope.Statements));
+
+        return new BoundProgram(diagnostics.ToImmutable(), functionBodies.ToImmutable(), statement);
     }
 
     private void BindFunctionDeclaration(FunctionDeclarationSyntax syntax)
