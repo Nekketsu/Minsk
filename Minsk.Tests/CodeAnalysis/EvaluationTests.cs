@@ -218,7 +218,7 @@ public class EvaluationTests
     [Fact]
     public void Evaluator_NameExpression_Reports_NoErrorForInsertedToken()
     {
-        var text = @"[]";
+        var text = @"1 + []";
 
         var diagnostics = @"
             Unexpected token <EndOfFileToken>, expected <IdentifierToken>.
