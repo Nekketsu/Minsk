@@ -1,10 +1,11 @@
 using System.CodeDom.Compiler;
+using Minsk.CodeAnalysis.Syntax;
 
 namespace Minsk.IO;
 
 internal static class TextWriterExtensions
 {
-    public static bool IsConsoleOut(this TextWriter writer)
+    private static bool IsConsoleOut(this TextWriter writer)
     {
         if (writer == Console.Out)
         {
@@ -19,7 +20,7 @@ internal static class TextWriterExtensions
         return false;
     }
 
-    public static void SetForeground(this TextWriter writer, ConsoleColor color)
+    private static void SetForeground(this TextWriter writer, ConsoleColor color)
     {
         if (writer.IsConsoleOut())
         {
@@ -27,12 +28,17 @@ internal static class TextWriterExtensions
         }
     }
 
-    public static void ResetColor(this TextWriter writer)
+    private static void ResetColor(this TextWriter writer)
     {
         if (writer.IsConsoleOut())
         {
             Console.ResetColor();
         }
+    }
+
+    public static void WriteKeyword(this TextWriter writer, SyntaxKind kind)
+    {
+        writer.WriteKeyword(SyntaxFacts.GetText(kind));
     }
 
     public static void WriteKeyword(this TextWriter writer, string text)
@@ -61,6 +67,16 @@ internal static class TextWriterExtensions
         writer.SetForeground(ConsoleColor.Magenta);
         writer.Write(text);
         writer.ResetColor();
+    }
+
+    public static void WriteSpace(this TextWriter writer)
+    {
+        writer.WritePunctuation(" ");
+    }
+
+    public static void WritePunctuation(this TextWriter writer, SyntaxKind kind)
+    {
+        writer.WritePunctuation(SyntaxFacts.GetText(kind));
     }
 
     public static void WritePunctuation(this TextWriter writer, string text)
