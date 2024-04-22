@@ -10,6 +10,9 @@ internal sealed class Binder
 {
     private readonly DiagnosticBag _diagnostics = new DiagnosticBag();
     private readonly FunctionSymbol? _function;
+
+    private Stack<(BoundLabel BreakLabel, BoundLabel ContinueLabel)> _loopStack = new Stack<(BoundLabel BreakLabel, BoundLabel ContinueLabel)>();
+    private int _labelCounter;
     private BoundScope _scope;
 
     public Binder(BoundScope? parent, FunctionSymbol? function)
@@ -166,6 +169,11 @@ internal sealed class Binder
 
     public DiagnosticBag Diagnostics => _diagnostics;
 
+    private BoundStatement BindErrorStatement()
+    {
+        return new BoundExpressionStatement(new BoundErrorExpression());
+    }
+
     private BoundStatement BindStatement(StatementSyntax syntax)
     {
         switch (syntax.Kind)
@@ -182,6 +190,10 @@ internal sealed class Binder
                 return DoBindWhileStatement((DoWhileStatementSyntax)syntax);
             case SyntaxKind.ForStatement:
                 return BindForStatement((ForStatementSyntax)syntax);
+            case SyntaxKind.BreakStatement:
+                return BindBreakStatement((BreakStatementSyntax)syntax);
+            case SyntaxKind.ContinueStatement:
+                return BindContinueStatement((ContinueStatementSyntax)syntax);
             case SyntaxKind.ExpressionStatement:
                 return BindExpressionStatement((ExpressionStatementSyntax)syntax);
             default:
@@ -241,18 +253,18 @@ internal sealed class Binder
         return new BoundIfStatement(condition, thenStatement, elseStatement);
     }
 
-    private BoundStatement DoBindWhileStatement(DoWhileStatementSyntax syntax)
-    {
-        var body = BindStatement(syntax.Body);
-        var condition = BindExpression(syntax.Condition, TypeSymbol.Bool);
-        return new BoundDoWhileStatement(body, condition);
-    }
-
     private BoundStatement BindWhileStatement(WhileStatementSyntax syntax)
     {
         var condition = BindExpression(syntax.Condition, TypeSymbol.Bool);
-        var body = BindStatement(syntax.Body);
-        return new BoundWhileStatement(condition, body);
+        var body = BindLoopBody(syntax.Body, out var breakLabel, out var continueLabel);
+        return new BoundWhileStatement(condition, body, breakLabel, continueLabel);
+    }
+
+    private BoundStatement DoBindWhileStatement(DoWhileStatementSyntax syntax)
+    {
+        var body = BindLoopBody(syntax.Body, out var breakLabel, out var continueLabel);
+        var condition = BindExpression(syntax.Condition, TypeSymbol.Bool);
+        return new BoundDoWhileStatement(body, condition, breakLabel, continueLabel);
     }
 
     private BoundStatement BindForStatement(ForStatementSyntax syntax)
@@ -263,11 +275,48 @@ internal sealed class Binder
         _scope = new BoundScope(_scope);
 
         var variable = BindVariable(syntax.Identifier, isReadOnly: true, TypeSymbol.Int);
-        var body = BindStatement(syntax.Body);
+        var body = BindLoopBody(syntax.Body, out var breakLabel, out var continueLabel);
 
         _scope = _scope.Parent;
 
-        return new BoundForStatement(variable, lowerBound, upperBound, body);
+        return new BoundForStatement(variable, lowerBound, upperBound, body, breakLabel, continueLabel);
+    }
+
+    private BoundStatement BindLoopBody(StatementSyntax body, out BoundLabel breakLabel, out BoundLabel continueLabel)
+    {
+        _labelCounter++;
+        breakLabel = new BoundLabel($"break{_labelCounter}");
+        continueLabel = new BoundLabel($"continue{_labelCounter}");
+
+        _loopStack.Push((breakLabel, continueLabel));
+        var boundBody = BindStatement(body);
+        _loopStack.Pop();
+
+        return boundBody;
+    }
+
+    private BoundStatement BindBreakStatement(BreakStatementSyntax syntax)
+    {
+        if (_loopStack.Count == 0)
+        {
+            _diagnostics.ReportInvalidBreakOrContinue(syntax.Keyword.Span, syntax.Keyword.Text);
+            return BindErrorStatement();
+        }
+
+        var breakLabel = _loopStack.Peek().BreakLabel;
+        return new BoundGotoStatement(breakLabel);
+    }
+
+    private BoundStatement BindContinueStatement(ContinueStatementSyntax syntax)
+    {
+        if (_loopStack.Count == 0)
+        {
+            _diagnostics.ReportInvalidBreakOrContinue(syntax.Keyword.Span, syntax.Keyword.Text);
+            return BindErrorStatement();
+        }
+
+        var continueLabel = _loopStack.Peek().ContinueLabel;
+        return new BoundGotoStatement(continueLabel);
     }
 
     private BoundStatement BindExpressionStatement(ExpressionStatementSyntax syntax)
@@ -434,10 +483,31 @@ internal sealed class Binder
 
         if (syntax.Arguments.Count != function.Parameters.Length)
         {
-            _diagnostics.ReportWrongArgumentCount(syntax.Span, function.Name, function.Parameters.Length, syntax.Arguments.Count);
+            TextSpan span;
+            if (syntax.Arguments.Count > function.Parameters.Length)
+            {
+                SyntaxNode firstExceedingNode;
+                if (function.Parameters.Length > 0)
+                {
+                    firstExceedingNode = syntax.Arguments.GetSeparator(function.Parameters.Length - 1);
+                }
+                else
+                {
+                    firstExceedingNode = syntax.Arguments[0];
+                }
+                var lastExceedingArgument = syntax.Arguments[syntax.Arguments.Count - 1];
+                span = TextSpan.FromBounds(firstExceedingNode.Span.Start, lastExceedingArgument.Span.End);
+            }
+            else
+            {
+                span = syntax.CloseParenthesisToken.Span;
+            }
+
+            _diagnostics.ReportWrongArgumentCount(span, function.Name, function.Parameters.Length, syntax.Arguments.Count);
             return new BoundErrorExpression();
         }
 
+        bool hasErrors = false;
         for (var i = 0; i < syntax.Arguments.Count; i++)
         {
             var argument = boundArguments[i];
@@ -445,7 +515,14 @@ internal sealed class Binder
 
             if (argument.Type != parameter.Type)
             {
-                _diagnostics.ReportWrongArgumentType(syntax.Arguments[i].Span, function.Name, parameter.Name, parameter.Type, argument.Type);
+                if (argument.Type != TypeSymbol.Error)
+                {
+                    _diagnostics.ReportWrongArgumentType(syntax.Arguments[i].Span, parameter.Name, parameter.Type, argument.Type);
+                }
+                hasErrors = true;
+            }
+            if (hasErrors)
+            {
                 return new BoundErrorExpression();
             }
         }

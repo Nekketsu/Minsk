@@ -92,18 +92,6 @@ internal abstract class BoundTreeRewriter
         return new BoundIfStatement(condition, thenStatement, elseStatement);
     }
 
-    protected virtual BoundStatement RewriteDoWhileStatement(BoundDoWhileStatement node)
-    {
-        var body = RewriteStatement(node.Body);
-        var condition = RewriteExpression(node.Condition);
-        if (body == node.Body && condition == node.Condition)
-        {
-            return node;
-        }
-
-        return new BoundDoWhileStatement(body, condition);
-    }
-
     protected virtual BoundStatement RewriteWhileStatement(BoundWhileStatement node)
     {
         var condition = RewriteExpression(node.Condition);
@@ -113,7 +101,19 @@ internal abstract class BoundTreeRewriter
             return node;
         }
 
-        return new BoundWhileStatement(condition, body);
+        return new BoundWhileStatement(condition, body, node.BreakLabel, node.ContinueLabel);
+    }
+
+    protected virtual BoundStatement RewriteDoWhileStatement(BoundDoWhileStatement node)
+    {
+        var body = RewriteStatement(node.Body);
+        var condition = RewriteExpression(node.Condition);
+        if (body == node.Body && condition == node.Condition)
+        {
+            return node;
+        }
+
+        return new BoundDoWhileStatement(body, condition, node.BreakLabel, node.ContinueLabel);
     }
 
     protected virtual BoundStatement RewriteForStatement(BoundForStatement node)
@@ -126,7 +126,7 @@ internal abstract class BoundTreeRewriter
             return node;
         }
 
-        return new BoundForStatement(node.Variable, lowerBound, upperBound, body);
+        return new BoundForStatement(node.Variable, lowerBound, upperBound, body, node.BreakLabel, node.ContinueLabel);
     }
 
     private BoundStatement RewriteLabelStatement(BoundLabelStatement node)

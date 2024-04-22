@@ -172,12 +172,16 @@ internal sealed class Parser
                 return ParseVariableDeclaration();
             case SyntaxKind.IfKeyword:
                 return ParseIfStatement();
-            case SyntaxKind.ForKeyword:
-                return ParseForStatement();
             case SyntaxKind.WhileKeyword:
                 return ParseWhileStatement();
             case SyntaxKind.DoKeyword:
                 return ParseDoWhileStatement();
+            case SyntaxKind.ForKeyword:
+                return ParseForStatement();
+            case SyntaxKind.BreakKeyword:
+                return ParseBreakStatement();
+            case SyntaxKind.ContinueKeyword:
+                return ContinueStatement();
             default:
                 return ParseExpressionStatement();
         }
@@ -279,6 +283,18 @@ internal sealed class Parser
         var condition = ParseExpression();
         var body = ParseStatement();
         return new WhileStatementSyntax(keyword, condition, body);
+    }
+
+    private StatementSyntax ParseBreakStatement()
+    {
+        var keyword = MatchToken(SyntaxKind.BreakKeyword);
+        return new BreakStatementSyntax(keyword);
+    }
+
+    private StatementSyntax ContinueStatement()
+    {
+        var keyword = MatchToken(SyntaxKind.ContinueKeyword);
+        return new ContinueStatementSyntax(keyword);
     }
 
     private StatementSyntax ParseForStatement()

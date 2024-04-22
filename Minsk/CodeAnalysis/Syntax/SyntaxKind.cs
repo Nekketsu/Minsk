@@ -35,6 +35,8 @@ public enum SyntaxKind
     IdentifierToken,
 
     //Keywords
+    BreakKeyword,
+    ContinueKeyword,
     ElseKeyword,
     FalseKeyword,
     ForKeyword,
@@ -62,6 +64,8 @@ public enum SyntaxKind
     WhileStatement,
     DoWhileStatement,
     ForStatement,
+    BreakStatement,
+    ContinueStatement,
     ExpressionStatement,
 
     // Expressions

@@ -60,6 +60,12 @@ public class EvaluationTests
     [InlineData("!true", false)]
     [InlineData("!false", true)]
     [InlineData("var a = 10", 10)]
+    [InlineData("\"test\"", "test")]
+    [InlineData("\"te\"\"st\"", "te\"st")]
+    [InlineData("\"test\" == \"test\"", true)]
+    [InlineData("\"test\" != \"test\"", false)]
+    [InlineData("\"test\" == \"abc\"", false)]
+    [InlineData("\"test\" != \"abc\"", true)]
     [InlineData("{ var a = 10 (a * a) }", 100)]
     [InlineData("{ var a = 0 (a = 10) * a }", 100)]
     [InlineData("{ var a = 0 if a == 0 a = 10 a }", 10)]
@@ -107,6 +113,34 @@ public class EvaluationTests
         var diagnostics = @"
             Unexpected token <CloseParenthesisToken>, expected <IdentifierToken>.
             Unexpected token <EndOfFileToken>, expected <CloseBraceToken>.
+        ";
+
+        AssertDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
+    public void Evaluator_InvokeFunctionArguments_Missing()
+    {
+        var text = @"
+            print([)]
+        ";
+
+        var diagnostics = @"
+            Function 'print' requires 1 arguments but was given 0.
+        ";
+
+        AssertDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
+    public void Evaluator_InvokeFucntionArguments_Exceeding()
+    {
+        var text = @"
+            print(""Hello""[, "" "", "" world!""])
+        ";
+
+        var diagnostics = @"
+            Function 'print' requires 1 arguments but was given 3.
         ";
 
         AssertDiagnostics(text, diagnostics);

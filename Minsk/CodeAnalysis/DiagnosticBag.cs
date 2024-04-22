@@ -115,15 +115,21 @@ internal sealed class DiagnosticBag : IEnumerable<Diagnostic>
         Report(span, message);
     }
 
-    public void ReportWrongArgumentType(TextSpan span, string name, string parameterName, TypeSymbol expectedType, TypeSymbol actualType)
+    public void ReportWrongArgumentType(TextSpan span, string parameterName, TypeSymbol expectedType, TypeSymbol actualType)
     {
-        var message = $"Parameter '{name}' requires a value of type '{expectedType}' but was given a value of type '{actualType}'.";
+        var message = $"Parameter '{parameterName}' requires a value of type '{expectedType}' but was given a value of type '{actualType}'.";
         Report(span, message);
     }
 
     public void ReportExpressionMustHaveValue(TextSpan span)
     {
         var message = "Expression must have a value.";
+        Report(span, message);
+    }
+
+    public void ReportInvalidBreakOrContinue(TextSpan span, string? text)
+    {
+        var message = $"The keyword '{text}' can only be used inside of loops";
         Report(span, message);
     }
 
