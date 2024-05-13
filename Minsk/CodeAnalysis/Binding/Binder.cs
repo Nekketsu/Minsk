@@ -75,6 +75,12 @@ internal sealed class Binder
                 var binder = new Binder(parentScope, function);
                 var body = binder.BindStatement(function.Declaration.Body);
                 var loweredBody = Lowerer.Lower(body);
+
+                if (function.Type != TypeSymbol.Void && !ControlFlowGraph.AllPathsReturn(loweredBody))
+                {
+                    binder._diagnostics.ReportAllPathsMustReturn(function.Declaration.Identifier.Span);
+                }
+
                 functionBodies.Add(function, loweredBody);
 
                 diagnostics.AddRange(binder.Diagnostics);
@@ -107,19 +113,14 @@ internal sealed class Binder
                 var parameter = new ParameterSymbol(parameterName, parameterType);
                 parameters.Add(parameter);
             }
+        }
 
-            var type = BindTypeClause(syntax.Type) ?? TypeSymbol.Void;
+        var type = BindTypeClause(syntax.Type) ?? TypeSymbol.Void;
 
-            if (type != TypeSymbol.Void)
-            {
-                _diagnostics.XXX_ReportFunctionsAreUnsupported(syntax.Type.Span);
-            }
-
-            var function = new FunctionSymbol(syntax.Identifier.Text, parameters.ToImmutable(), type, syntax);
-            if (!_scope.TryDeclareFunction(function))
-            {
-                _diagnostics.ReportSymbolAlreadyDeclared(syntax.Identifier.Span, function.Name);
-            }
+        var function = new FunctionSymbol(syntax.Identifier.Text, parameters.ToImmutable(), type, syntax);
+        if (!_scope.TryDeclareFunction(function))
+        {
+            _diagnostics.ReportSymbolAlreadyDeclared(syntax.Identifier.Span, function.Name);
         }
     }
 
@@ -194,6 +195,8 @@ internal sealed class Binder
                 return BindBreakStatement((BreakStatementSyntax)syntax);
             case SyntaxKind.ContinueStatement:
                 return BindContinueStatement((ContinueStatementSyntax)syntax);
+            case SyntaxKind.ReturnStatement:
+                return BindReturnStatement((ReturnStatementSyntax)syntax);
             case SyntaxKind.ExpressionStatement:
                 return BindExpressionStatement((ExpressionStatementSyntax)syntax);
             default:
@@ -305,6 +308,39 @@ internal sealed class Binder
 
         var breakLabel = _loopStack.Peek().BreakLabel;
         return new BoundGotoStatement(breakLabel);
+    }
+
+    private BoundStatement BindReturnStatement(ReturnStatementSyntax syntax)
+    {
+        var expression = syntax.Expression is null ? null : BindExpression(syntax.Expression);
+
+        if (_function is null)
+        {
+            _diagnostics.ReportInvalidReturn(syntax.ReturnKeyword.Span);
+        }
+        else
+        {
+            if (_function.Type == TypeSymbol.Void)
+            {
+                if (expression is not null)
+                {
+                    _diagnostics.ReportInvalidReturnExpression(syntax.Expression.Span, _function.Name);
+                }
+            }
+            else
+            {
+                if (expression is null)
+                {
+                    _diagnostics.ReportMissingReturnExpression(syntax.ReturnKeyword.Span, _function.Type);
+                }
+                else
+                {
+                    expression = BindConversion(syntax.Expression.Span, expression, _function.Type);
+                }
+            }
+        }
+
+        return new BoundReturnStatement(expression);
     }
 
     private BoundStatement BindContinueStatement(ContinueStatementSyntax syntax)
@@ -472,8 +508,6 @@ internal sealed class Binder
             var boundArgument = BindExpression(argument);
             boundArguments.Add(boundArgument);
         }
-
-        var functions = BuiltinFunctions.GetAll();
 
         if (!_scope.TryLookupFunction(syntax.Identifier.Text, out var function))
         {

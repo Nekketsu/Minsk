@@ -72,6 +72,10 @@ internal sealed class Evaluator
                 case BoundNodeKind.LabelStatement:
                     index++;
                     break;
+                case BoundNodeKind.ReturnStatement:
+                    var rs = (BoundReturnStatement)s;
+                    var _lastValue = rs.Expression is null ? null : EvaluateExpression(rs.Expression);
+                    return _lastValue;
                 default:
                     throw new Exception($"Unexpected node {s.Kind}");
             }

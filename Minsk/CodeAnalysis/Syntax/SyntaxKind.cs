@@ -43,6 +43,7 @@ public enum SyntaxKind
     FunctionKeyword,
     IfKeyword,
     LetKeyword,
+    ReturnKeyword,
     ToKeyword,
     TrueKeyword,
     VarKeyword,
@@ -66,6 +67,7 @@ public enum SyntaxKind
     ForStatement,
     BreakStatement,
     ContinueStatement,
+    ReturnStatement,
     ExpressionStatement,
 
     // Expressions

@@ -26,6 +26,8 @@ internal abstract class BoundTreeRewriter
                 return RewriteGotoStatement((BoundGotoStatement)node);
             case BoundNodeKind.ConditionalGotoStatement:
                 return RewriteConditionalGotoStatement((BoundConditionalGotoStatement)node);
+            case BoundNodeKind.ReturnStatement:
+                return RewriteReturnStatement((BoundReturnStatement)node);
             case BoundNodeKind.ExpressionStatement:
                 return RewriteExpressionStatement((BoundExpressionStatement)node);
             default:
@@ -129,17 +131,17 @@ internal abstract class BoundTreeRewriter
         return new BoundForStatement(node.Variable, lowerBound, upperBound, body, node.BreakLabel, node.ContinueLabel);
     }
 
-    private BoundStatement RewriteLabelStatement(BoundLabelStatement node)
+    protected virtual BoundStatement RewriteLabelStatement(BoundLabelStatement node)
     {
         return node;
     }
 
-    private BoundStatement RewriteGotoStatement(BoundGotoStatement node)
+    protected virtual BoundStatement RewriteGotoStatement(BoundGotoStatement node)
     {
         return node;
     }
 
-    private BoundStatement RewriteConditionalGotoStatement(BoundConditionalGotoStatement node)
+    protected private BoundStatement RewriteConditionalGotoStatement(BoundConditionalGotoStatement node)
     {
         var condition = RewriteExpression(node.Condition);
         if (condition == node.Condition)
@@ -148,6 +150,17 @@ internal abstract class BoundTreeRewriter
         }
 
         return new BoundConditionalGotoStatement(node.Label, condition, node.JumpIfTrue);
+    }
+
+    protected virtual BoundStatement RewriteReturnStatement(BoundReturnStatement node)
+    {
+        var expression = node.Expression is null ? null : RewriteExpression(node.Expression);
+        if (expression == node.Expression)
+        {
+            return node;
+        }
+
+        return new BoundReturnStatement(expression);
     }
 
     protected virtual BoundStatement RewriteExpressionStatement(BoundExpressionStatement node)
