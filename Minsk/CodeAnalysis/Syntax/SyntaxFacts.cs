@@ -1,3 +1,5 @@
+using System.Diagnostics.Metrics;
+
 namespace Minsk.CodeAnalysis.Syntax;
 
 public static class SyntaxFacts
@@ -71,6 +73,8 @@ public static class SyntaxFacts
                 return SyntaxKind.IfKeyword;
             case "let":
                 return SyntaxKind.LetKeyword;
+            case "return":
+                return SyntaxKind.ReturnKeyword;
             case "true":
                 return SyntaxKind.TrueKeyword;
             case "to":
@@ -158,6 +162,8 @@ public static class SyntaxFacts
                 return "{";
             case SyntaxKind.CloseBraceToken:
                 return "}";
+            case SyntaxKind.ColonToken:
+                return ":";
             case SyntaxKind.CommaToken:
                 return ",";
             case SyntaxKind.BreakKeyword:
@@ -174,12 +180,14 @@ public static class SyntaxFacts
                 return "function";
             case SyntaxKind.IfKeyword:
                 return "if";
-            case SyntaxKind.TrueKeyword:
-                return "true";
             case SyntaxKind.LetKeyword:
                 return "let";
+            case SyntaxKind.ReturnKeyword:
+                return "return";
             case SyntaxKind.ToKeyword:
                 return "to";
+            case SyntaxKind.TrueKeyword:
+                return "true";
             case SyntaxKind.VarKeyword:
                 return "var";
             case SyntaxKind.WhileKeyword:
